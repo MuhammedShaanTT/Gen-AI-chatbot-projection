@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            width: 400px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .message.user {
+            text-align: right;
+        }
+        .message.chatbot {
+            text-align: left;
+        }
+        .message p {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+        .message.user p {
+            background-color: #007bff;
+            color: white;
+        }
+        .message.chatbot p {
+            background-color: #eeeeee;
+            color: black;
+        }
+        .input-container {
+            display: flex;
+            padding: 10px;
+        }
+        .input-container input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            margin-right: 10px;
+        }
+        .input-container button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box">
+            <!-- Messages will be appended here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function addMessage(sender, message) {
+            const chatBox = document.getElementById('chat-box');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the bottom
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+
+            if (message) {
+                addMessage('user', message);
+
+                // Send message to the backend
+                const response = await fetch('http://127.0.0.1:5000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                const chatbotResponse = data.chatbot_response;
+
+                // Display chatbot response
+                addMessage('chatbot', chatbotResponse);
+
+                // Clear input field
+                userInput.value = '';
+            }
+        }
+    </script>
+
+</body>
+</html>
